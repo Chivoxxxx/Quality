@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software Quality Model Installation</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #1e1e1e;
+            color: #00ff00;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .terminal {
+            background-color: #151515;
+            border-radius: 10px;
+            padding: 20px;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.7);
+        }
+
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2d2d2d;
+            border-radius: 10px 10px 0 0;
+            padding: 10px 15px;
+            color: #fff;
+        }
+
+        .terminal-header .buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .terminal-header .buttons div {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-header .close {
+            background-color: #ff5f57;
+        }
+
+        .terminal-header .minimize {
+            background-color: #ffbd2e;
+        }
+
+        .terminal-header .maximize {
+            background-color: #28c840;
+        }
+
+        .terminal-content {
+            margin-top: 10px;
+            text-align: left;
+            font-size: 1.2rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .command {
+            color: #ff5f57;
+        }
+
+        .output {
+            color: #00ff00;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background-color: #00ff00;
+            animation: blink 0.7s infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            50.1%, 100% { opacity: 0; }
+        }
+
+        .progress-container {
+            margin-top: 20px;
+            width: 80%;
+            background-color: #333;
+            border-radius: 10px;
+            height: 20px;
+            display: none; /* Initially hidden */
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: #00ff00;
+            border-radius: 10px;
+            text-align: center;
+            line-height: 20px;
+            color: #151515;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="terminal">
+        <div class="terminal-header">
+            <div class="buttons">
+                <div class="close"></div>
+                <div class="minimize"></div>
+                <div class="maximize"></div>
+            </div>
+            <span>Terminal</span>
+        </div>
+        <div class="terminal-content" id="terminal-content"></div>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar">0%</div>
+        </div>
+    </div>
+
+    <script>
+        const messages = [
+            { text: "Establishing connection...", pause: true },
+            { text: "Connecting to the database...", pause: true },
+            { text: "Database connection successful.", pause: false },
+            { text: "Deploying The SATC Model...", pause: true },  <!-- Model name added here -->
+            { text: "Installing necessary components...", pause: true },
+            { text: "Installing Model dependencies...", pause: true },
+            { text: "Model installation in progress...", pause: true },
+            { text: "Installation complete. Redirecting...", pause: false }
+        ];
+
+        const terminalContent = document.getElementById("terminal-content");
+        const progressBar = document.getElementById("progress-bar");
+        const progressContainer = document.querySelector(".progress-container");
+        const typingSpeed = 40; // Faster typing speed
+        const progressSpeed = 50; // Speed of progress bar update
+
+        let progress = 0;
+        
+        // Function to type messages letter by letter
+        async function typeMessages() {
+            for (const message of messages) {
+                await typeLine(message.text, message.pause);
+            }
+            showProgressBar(); // Show the progress bar after all messages are typed
+        }
+
+        // Function to type a single line
+        function typeLine(line, pause) {
+            return new Promise(resolve => {
+                const div = document.createElement("div");
+                div.innerHTML = `<span class="command">~$</span> <span class="output"></span><span class='cursor'></span>`;
+                terminalContent.appendChild(div);
+
+                const output = div.querySelector(".output");
+                const cursor = div.querySelector(".cursor");
+
+                let i = 0;
+                const interval = setInterval(() => {
+                    if (i < line.length) {
+                        output.textContent += line[i];
+                        i++;
+                    } else {
+                        clearInterval(interval);
+                        cursor.style.display = "none";
+                        if (pause) {
+                            setTimeout(resolve, 1000); // Add a pause before proceeding
+                        } else {
+                            resolve(); // No pause for success messages
+                        }
+                    }
+                }, typingSpeed);
+            });
+        }
+
+        // Function to show the progress bar and simulate the installation progress
+        function showProgressBar() {
+            progressContainer.style.display = "block";  // Show the progress bar
+            const interval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = progress + "%";
+                progressBar.textContent = progress + "%";
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        window.location.href = "SATC.html"; // Redirect after completion
+                    }, 1000);
+                }
+            }, progressSpeed);
+        }
+
+        // Start typing messages
+        typeMessages();
+    </script>
+</body>
+</html>
