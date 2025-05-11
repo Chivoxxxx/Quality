@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ChivXP Terminal</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      font-family: 'Fira Code', monospace;
+      color: #ffeb3b;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #terminal {
+      background: #000;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 800px;
+    }
+
+    .title-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .title-bar span {
+      height: 12px;
+      width: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .red { background: #ff5f56; }
+    .yellow { background: #ffbd2e; }
+    .green { background: #27c93f; }
+
+    .line {
+      display: flex;
+      align-items: center;
+      margin: 4px 0;
+    }
+
+    .prompt {
+      color: #ffeb3b;
+      margin-right: 8px;
+      white-space: nowrap;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    input {
+      background: transparent;
+      color: #ffeb3b;
+      border: none;
+      font-family: inherit;
+      font-size: 1em;
+      flex-grow: 1;
+      outline: none;
+    }
+
+    .output {
+      margin: 4px 0;
+    }
+
+    .loading-bar-container {
+      background: #444;
+      border-radius: 4px;
+      height: 14px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .loading-bar {
+      height: 100%;
+      background: #ffeb3b;
+      width: 0%;
+      transition: width 4s linear;
+    }
+
+    ul {
+      margin: 10px 0 0 20px;
+    }
+
+    li {
+      margin-bottom: 5px;
+      list-style: none;
+    }
+
+    li:hover {
+      background: rgba(255, 235, 59, 0.1);
+      cursor: pointer;
+    }
+
+    .blinking-cursor {
+      display: inline-block;
+      width: 10px;
+      background: #ffeb3b;
+      animation: blink 1s step-start infinite;
+      height: 1em;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div id="terminal">
+    <div class="title-bar">
+      <span class="red"></span>
+      <span class="yellow"></span>
+      <span class="green"></span>
+    </div>
+
+    <!-- STEP 1 -->
+    <div id="boot">
+      <div class="line">
+        <span class="prompt">root@kali:~#</span>
+        <input id="sshCommand" autofocus autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div id="step2" class="hidden">
+      <div class="line">chivxp@123.456.789.101's password:</div>
+      <div class="line"><input id="password" type="password" autocomplete="new-password"></div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div id="step3" class="hidden">
+      <div class="output">Connecting to chivxp@123.456.789.101...</div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div id="step4" class="hidden">
+      <div class="output" id="loadingMessages"></div>
+      <div class="loading-bar-container">
+        <div class="loading-bar" id="bar"></div>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div id="step5" class="hidden">
+      <div class="output">Available Database Dumps:</div>
+      <ul>
+        <li>📁 student_records_2024.sql</li>
+        <li>📁 marketing_contacts.json</li>
+        <li onclick="rickRoll()">📁 business_law_students.csv</li>
+        <li>📁 confidential_emails.mbox</li>
+        <li>📁 financial_reports_q1_2024.xlsx</li>
+        <li>📁 internal_chat_logs_teams.xml</li>
+        <li>📁 hr_blacklist_candidates.json</li>
+        <li>📁 audit_logs_2023.zip</li>
+        <li>📁 source_code_backup.tar.gz</li>
+        <li>📁 employee_insurance_data.csv</li>
+        <li>📁 customer_support_tickets.db</li>
+        <li>📁 vpn_usage_logs.txt</li>
+        <li>📁 system_error_reports.log</li>
+        <li>📁 payroll_q4_2023.pdf</li>
+        <li>📁 github_api_tokens.txt</li>
+        <li>📁 leaked_credentials_combined.txt</li>
+        <li>📁 meeting_transcripts_teams.docx</li>
+        <li>📁 server_metrics_2023.json</li>
+        <li>📁 encryption_keys.bak</li>
+        <li>📁 deprecated_user_accounts.xml</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const sshInput = document.getElementById('sshCommand');
+    const passwordInput = document.getElementById('password');
+    const bar = document.getElementById('bar');
+    const loadingMessages = document.getElementById('loadingMessages');
+
+    const fakeMessages = [
+      '>> Initializing secure shell...',
+      '>> Handshake successful.',
+      '>> Authenticating...',
+      '>> Session granted.',
+      '>> Accessing internal storage...',
+      '>> Verifying permissions...',
+      '>> Decrypting session key...',
+      '>> Setting up environment variables...',
+      '>> Checking firewall rules...',
+      '>> Loading user profile...',
+      '>> Pulling active database connections...',
+      '>> Collecting database metadata...',
+      '>> Loading access control policies...',
+      '>> Fetching dump catalog...',
+      '>> Validating checksum...',
+      '>> All systems ready...',
+      '>> Retrieving database list...'
+    ];
+
+    sshInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        const val = sshInput.value.trim();
+        if (val.startsWith('ssh chivxp@')) {
+          document.getElementById('boot').classList.add('hidden');
+          document.getElementById('step2').classList.remove('hidden');
+          passwordInput.focus();
+        }
+      }
+    });
+
+    passwordInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('step2').classList.add('hidden');
+        document.getElementById('step3').classList.remove('hidden');
+
+        setTimeout(() => {
+          document.getElementById('step3').classList.add('hidden');
+          document.getElementById('step4').classList.remove('hidden');
+
+          let i = 0;
+          const interval = setInterval(() => {
+            if (i < fakeMessages.length) {
+              loadingMessages.innerHTML += fakeMessages[i] + '<br>';
+              i++;
+            } else {
+              clearInterval(interval);
+              bar.style.width = '100%';
+              setTimeout(() => {
+                document.getElementById('step4').classList.add('hidden');
+                document.getElementById('step5').classList.remove('hidden');
+              }, 4000);
+            }
+          }, 1000); // slow: 1s per line
+        }, 1500); // Simulated connecting delay
+      }
+    });
+
+    function rickRoll() {
+      window.location.href = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+    }
+  </script>
+</body>
+</html>
